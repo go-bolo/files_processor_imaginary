@@ -6,6 +6,7 @@ import (
 
 	files_processor "github.com/go-catupiry/files/processor"
 	"github.com/go-resty/resty/v2"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -48,9 +49,11 @@ func (c *Client) Resize(sourcePath string, destPath string, opts files_processor
 		opts["nocrop"] = "false"
 	}
 
+	id := uuid.New()
+
 	res, err := httpClient.R().
 		SetQueryParams(opts).
-		SetFileReader("file", "tux.png", f).
+		SetFileReader("file", id, f).
 		SetContentLength(true).
 		SetOutput(destPath).
 		Post(url)
