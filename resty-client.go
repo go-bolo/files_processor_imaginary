@@ -53,7 +53,7 @@ func (c *Client) Resize(sourcePath string, destPath string, opts files_processor
 
 	res, err := httpClient.R().
 		SetQueryParams(opts).
-		SetFileReader("file", id, f).
+		SetFileReader("file", id.String(), f).
 		SetContentLength(true).
 		SetOutput(destPath).
 		Post(url)
