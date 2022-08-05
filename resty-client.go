@@ -30,14 +30,66 @@ func NewClient(cfg *ClientConfiguration) *Client {
 	return &c
 }
 
-func (c *Client) Resize(sourcePath string, destPath string, opts files_processor.Options) error {
+func (c *Client) Resize(sourcePath, destPath, fileName string, opts files_processor.Options) error {
+	if _, ok := opts["url"]; ok {
+		err := c.ResizeFromWeb(sourcePath, destPath, fileName, opts)
+		if err != nil {
+			return err
+		}
+	} else {
+		err := c.ResizeFromLocalhost(sourcePath, destPath, opts)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Client) ResizeFromWeb(sourcePath, destPath, fileName string, opts files_processor.Options) error {
+	url := c.Cfg.URL + "/resize"
+	httpClient := resty.New()
+
+	if _, ok := opts["type"]; !ok {
+		opts["type"] = "webp"
+	}
+
+	if _, ok := opts["nocrop"]; !ok {
+		opts["nocrop"] = "false"
+	}
+
+	res, err := httpClient.R().
+		SetQueryParams(opts).
+		SetContentLength(true).
+		SetOutput(destPath).
+		Get(url)
+
+	// execution error
+	if err != nil {
+		return errors.Wrap(err, "error on access imaginary api")
+	}
+	// http error
+	if res.IsError() {
+		logrus.WithFields(logrus.Fields{
+			"error":  fmt.Sprintf("%+v\n", err),
+			"status": res.StatusCode(),
+			"bory":   res.String(),
+		}).Error("ResizeFromWeb Response error", err)
+
+		return errors.New(res.String())
+	}
+
+	return nil
+}
+
+func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts files_processor.Options) error {
 	url := c.Cfg.URL + "/resize"
 
 	httpClient := resty.New()
 
 	f, err := os.Open(sourcePath)
 	if err != nil {
-		return errors.Wrap(err, "error on open file from sourcePath")
+		return errors.Wrap(err, "resizeFromLocalhost error on open file from sourcePath")
 	}
 	defer f.Close()
 
@@ -60,7 +112,7 @@ func (c *Client) Resize(sourcePath string, destPath string, opts files_processor
 
 	// execution error
 	if err != nil {
-		return errors.Wrap(err, "error on access imaginary api")
+		return errors.Wrap(err, "resizeFromLocalhost error on access imaginary api")
 	}
 	// http error
 	if res.IsError() {
@@ -68,7 +120,37 @@ func (c *Client) Resize(sourcePath string, destPath string, opts files_processor
 			"error":  fmt.Sprintf("%+v\n", err),
 			"status": res.StatusCode(),
 			"bory":   res.String(),
-		}).Error("Response error", err)
+		}).Error("resizeFromLocalhost response error", err)
+
+		return errors.New(res.String())
+	}
+
+	return nil
+}
+
+// DownloadFile
+// Usage:
+// originalPath := path.Join(os.TempDir(), fileName) + "_original"
+// defer os.Remove(originalPath)
+// DownloadFile(fileURL, originalPath, fileName string) (error)
+//
+func (c *Client) DownloadFile(fileURL, donwloadedFilePath, fileName string) error {
+	httpClient := resty.New()
+	res, err := httpClient.R().
+		SetOutput(donwloadedFilePath).
+		Get(fileURL)
+
+	// execution error
+	if err != nil {
+		return errors.Wrap(err, "resizeFromLocalhost error on download original image")
+	}
+	// http error
+	if res.IsError() {
+		logrus.WithFields(logrus.Fields{
+			"error":  fmt.Sprintf("%+v\n", err),
+			"status": res.StatusCode(),
+			"bory":   res.String(),
+		}).Error("resizeFromLocalhost Response error", err)
 
 		return errors.New(res.String())
 	}

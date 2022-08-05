@@ -100,8 +100,8 @@ github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1/go.
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/go-catupiry/catu v0.0.12/go.mod h1:uKRyFQNISrrA4CXgkKUQ5Tm8K2r9g3XqHeoXRJk5EHM=
-github.com/go-catupiry/files v0.0.0-20220803105904-839c7ce9681e h1:bDiLoXDqs6/CqLfsT3d3BoMOFHhv7XAivGos5KTMe8E=
-github.com/go-catupiry/files v0.0.0-20220803105904-839c7ce9681e/go.mod h1:1HjeyGWC3M3NiD+91f3e7MGmj04NAi3GBsB0RVo7f0w=
+github.com/go-catupiry/files v0.0.3 h1:MiBumjF8KrLvq2X1XD7dTnPYpFjoRcCF+qSu44+rfF4=
+github.com/go-catupiry/files v0.0.3/go.mod h1:1HjeyGWC3M3NiD+91f3e7MGmj04NAi3GBsB0RVo7f0w=
 github.com/go-catupiry/query_parser_to_db v0.0.3/go.mod h1:/gB7YPOkWUaDLtCVYz07hZHmp0FughnurJ64LkrQwI8=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
