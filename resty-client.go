@@ -50,7 +50,9 @@ func (c *Client) ResizeFromWeb(sourcePath, destPath, fileName string, opts files
 	url := c.Cfg.URL + "/resize"
 	httpClient := resty.New()
 
-	if _, ok := opts["type"]; !ok {
+	if f, ok := opts["format"]; ok {
+		opts["type"] = f
+	} else if _, ok := opts["type"]; !ok {
 		opts["type"] = "webp"
 	}
 
@@ -93,7 +95,9 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 	}
 	defer f.Close()
 
-	if _, ok := opts["type"]; !ok {
+	if f, ok := opts["format"]; ok {
+		opts["type"] = f
+	} else if _, ok := opts["type"]; !ok {
 		opts["type"] = "webp"
 	}
 
@@ -133,7 +137,6 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 // originalPath := path.Join(os.TempDir(), fileName) + "_original"
 // defer os.Remove(originalPath)
 // DownloadFile(fileURL, originalPath, fileName string) (error)
-//
 func (c *Client) DownloadFile(fileURL, donwloadedFilePath, fileName string) error {
 	httpClient := resty.New()
 	res, err := httpClient.R().
