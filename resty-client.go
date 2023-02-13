@@ -116,6 +116,12 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 
 	// execution error
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"error":   fmt.Sprintf("%+v\n", err),
+			"status":  res.StatusCode(),
+			"headers": res.Header(),
+			"bory":    res.String(),
+		}).Error("resizeFromLocalhost error on access imaginary api", err)
 		return errors.Wrap(err, "resizeFromLocalhost error on access imaginary api")
 	}
 	// http error
