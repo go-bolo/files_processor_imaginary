@@ -5,8 +5,8 @@ import (
 	"os"
 
 	files_processor "github.com/go-catupiry/files/processor"
-	"github.com/go-resty/resty/v2"
 	"github.com/google/uuid"
+	"github.com/imroc/req/v3"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -15,16 +15,15 @@ type ClientConfiguration struct {
 	URL string
 }
 
-// lib https://github.com/h2non/imaginary
-
 type Client struct {
-	HTTP *resty.Client
+	HTTP *req.Client
 	Cfg  *ClientConfiguration
 }
 
 func NewClient(cfg *ClientConfiguration) *Client {
 	c := Client{
-		Cfg: cfg,
+		HTTP: req.C(),
+		Cfg:  cfg,
 	}
 
 	return &c
@@ -48,7 +47,6 @@ func (c *Client) Resize(sourcePath, destPath, fileName string, opts files_proces
 
 func (c *Client) ResizeFromWeb(sourcePath, destPath, fileName string, opts files_processor.Options) error {
 	url := c.Cfg.URL + "/resize"
-	httpClient := resty.New()
 
 	if f, ok := opts["format"]; ok {
 		opts["type"] = f
@@ -60,22 +58,25 @@ func (c *Client) ResizeFromWeb(sourcePath, destPath, fileName string, opts files
 		opts["nocrop"] = "false"
 	}
 
-	res, err := httpClient.R().
+	res, err := c.HTTP.R().
 		SetQueryParams(opts).
-		SetContentLength(true).
-		SetOutput(destPath).
+		SetOutputFile(destPath).
 		Get(url)
 
-	// execution error
 	if err != nil {
-		return errors.Wrap(err, "error on access imaginary api")
-	}
-	// http error
-	if res.IsError() {
 		logrus.WithFields(logrus.Fields{
 			"error":  fmt.Sprintf("%+v\n", err),
-			"status": res.StatusCode(),
-			"bory":   res.String(),
+			"status": res.StatusCode,
+			"dump":   res.Dump(),
+		}).Error("ResizeFromWeb error", err)
+		return errors.Wrap(err, "error on access imaginary api")
+	}
+
+	if res.IsErrorState() {
+		logrus.WithFields(logrus.Fields{
+			"error":  fmt.Sprintf("%+v\n", err),
+			"status": res.StatusCode,
+			"dump":   res.Dump(),
 		}).Error("ResizeFromWeb Response error", err)
 
 		return errors.New(res.String())
@@ -86,8 +87,6 @@ func (c *Client) ResizeFromWeb(sourcePath, destPath, fileName string, opts files
 
 func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts files_processor.Options) error {
 	url := c.Cfg.URL + "/resize"
-
-	httpClient := resty.New()
 
 	f, err := os.Open(sourcePath)
 	if err != nil {
@@ -107,29 +106,29 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 
 	id := uuid.New()
 
-	res, err := httpClient.R().
+	res, err := c.HTTP.R().
 		SetQueryParams(opts).
 		SetFileReader("file", id.String(), f).
-		SetContentLength(true).
-		SetOutput(destPath).
+		SetOutputFile(destPath).
 		Post(url)
 
 	// execution error
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"error":   fmt.Sprintf("%+v\n", err),
-			"status":  res.StatusCode(),
-			"headers": res.Header(),
+			"status":  res.StatusCode,
+			"headers": res.Header,
 			"body":    res.String(),
 		}).Error("resizeFromLocalhost error on access imaginary api", err)
 		return errors.Wrap(err, "resizeFromLocalhost error on access imaginary api")
 	}
+
 	// http error
 	if res.IsError() {
 		logrus.WithFields(logrus.Fields{
 			"error":  fmt.Sprintf("%+v\n", err),
-			"status": res.StatusCode(),
-			"bory":   res.String(),
+			"status": res.StatusCode,
+			"body":   res.String(),
 		}).Error("resizeFromLocalhost response error", err)
 
 		return errors.New(res.String())
@@ -144,9 +143,8 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 // defer os.Remove(originalPath)
 // DownloadFile(fileURL, originalPath, fileName string) (error)
 func (c *Client) DownloadFile(fileURL, donwloadedFilePath, fileName string) error {
-	httpClient := resty.New()
-	res, err := httpClient.R().
-		SetOutput(donwloadedFilePath).
+	res, err := c.HTTP.R().
+		SetOutputFile(donwloadedFilePath).
 		Get(fileURL)
 
 	// execution error
@@ -157,8 +155,8 @@ func (c *Client) DownloadFile(fileURL, donwloadedFilePath, fileName string) erro
 	if res.IsError() {
 		logrus.WithFields(logrus.Fields{
 			"error":  fmt.Sprintf("%+v\n", err),
-			"status": res.StatusCode(),
-			"bory":   res.String(),
+			"status": res.StatusCode,
+			"body":   res.String(),
 		}).Error("resizeFromLocalhost Response error", err)
 
 		return errors.New(res.String())
