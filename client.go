@@ -65,9 +65,7 @@ func (c *Client) ResizeFromWeb(sourcePath, destPath, fileName string, opts files
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
-			"error":  fmt.Sprintf("%+v\n", err),
-			"status": res.StatusCode,
-			"dump":   res.Dump(),
+			"error": fmt.Sprintf("%+v\n", err),
 		}).Error("ResizeFromWeb error", err)
 		return errors.Wrap(err, "error on access imaginary api")
 	}
@@ -115,10 +113,7 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 	// execution error
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
-			"error":   fmt.Sprintf("%+v\n", err),
-			"status":  res.StatusCode,
-			"headers": res.Header,
-			"body":    res.String(),
+			"error": fmt.Sprintf("%+v\n", err),
 		}).Error("resizeFromLocalhost error on access imaginary api", err)
 		return errors.Wrap(err, "resizeFromLocalhost error on access imaginary api")
 	}
@@ -128,9 +123,8 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 		logrus.WithFields(logrus.Fields{
 			"error":  fmt.Sprintf("%+v\n", err),
 			"status": res.StatusCode,
-			"body":   res.String(),
+			"dump":   res.Dump(),
 		}).Error("resizeFromLocalhost response error", err)
-
 		return errors.New(res.String())
 	}
 
