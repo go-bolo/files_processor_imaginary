@@ -120,7 +120,7 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 			"error":   fmt.Sprintf("%+v\n", err),
 			"status":  res.StatusCode(),
 			"headers": res.Header(),
-			"bory":    res.String(),
+			"body":    res.String(),
 		}).Error("resizeFromLocalhost error on access imaginary api", err)
 		return errors.Wrap(err, "resizeFromLocalhost error on access imaginary api")
 	}
