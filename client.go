@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	files_processor "github.com/go-catupiry/files/processor"
+	files_processor "github.com/go-bolo/files/processor"
 	"github.com/google/uuid"
 	"github.com/imroc/req/v3"
 	"github.com/pkg/errors"

@@ -1,13 +1,13 @@
-module github.com/go-catupiry/files_processor_imaginary
+module github.com/go-bolo/files_processor_imaginary
 
-go 1.17
+go 1.20
 
-require golang.org/x/sys v0.5.0 // indirect
+require golang.org/x/sys v0.10.0 // indirect
 
-require github.com/sirupsen/logrus v1.9.0
+require github.com/sirupsen/logrus v1.9.3
 
 require (
-	github.com/go-catupiry/files v0.0.10
+	github.com/go-bolo/files v1.0.0
 	github.com/google/uuid v1.3.0
 	github.com/imroc/req/v3 v3.32.0
 	github.com/pkg/errors v0.9.1
@@ -25,10 +25,10 @@ require (
 	github.com/quic-go/qtls-go1-19 v0.2.0 // indirect
 	github.com/quic-go/qtls-go1-20 v0.1.0 // indirect
 	github.com/quic-go/quic-go v0.32.0 // indirect
-	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/exp v0.0.0-20230213192124-5e25df0256eb // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.6.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
+	golang.org/x/net v0.12.0 // indirect
+	golang.org/x/text v0.11.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 )
