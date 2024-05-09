@@ -7,7 +7,6 @@ import (
 	files_processor "github.com/go-bolo/files/processor"
 	"github.com/google/uuid"
 	"github.com/imroc/req/v3"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -65,19 +64,25 @@ func (c *Client) ResizeFromWeb(sourcePath, destPath, fileName string, opts files
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
-			"error": fmt.Sprintf("%+v\n", err),
+			"error":       fmt.Sprintf("%+v\n", err),
+			"file_name":   fileName,
+			"source_path": sourcePath,
+			"dest_path":   destPath,
 		}).Error("ResizeFromWeb error", err)
-		return errors.Wrap(err, "error on access imaginary api")
+		return fmt.Errorf("ResizeFromWeb error on access imaginary api: %w", err)
 	}
 
 	if res.IsErrorState() {
 		logrus.WithFields(logrus.Fields{
-			"error":  fmt.Sprintf("%+v\n", err),
-			"status": res.StatusCode,
-			"dump":   res.Dump(),
+			"error":       fmt.Sprintf("%+v\n", err),
+			"status":      res.StatusCode,
+			"dump":        res.Dump(),
+			"file_name":   fileName,
+			"source_path": sourcePath,
+			"dest_path":   destPath,
 		}).Error("ResizeFromWeb Response error", err)
 
-		return errors.New(res.String())
+		return fmt.Errorf(res.String())
 	}
 
 	return nil
@@ -88,8 +93,9 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 
 	f, err := os.Open(sourcePath)
 	if err != nil {
-		return errors.Wrap(err, "resizeFromLocalhost error on open file from sourcePath")
+		return fmt.Errorf("ResizeFromLocalhost error on open file from sourcePath: %w", err)
 	}
+
 	defer f.Close()
 
 	if f, ok := opts["format"]; ok {
@@ -113,19 +119,24 @@ func (c *Client) ResizeFromLocalhost(sourcePath string, destPath string, opts fi
 	// execution error
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
-			"error": fmt.Sprintf("%+v\n", err),
-		}).Error("resizeFromLocalhost error on access imaginary api", err)
-		return errors.Wrap(err, "resizeFromLocalhost error on access imaginary api")
+			"error":       fmt.Sprintf("%+v\n", err),
+			"file_id":     id.String(),
+			"source_path": sourcePath,
+			"dest_path":   destPath,
+		}).Error("ResizeFromLocalhost error on access imaginary api", err)
+		return fmt.Errorf("ResizeFromLocalhost error on access imaginary api: %w", err)
 	}
 
 	// http error
-	if res.IsError() {
+	if res.IsErrorState() {
 		logrus.WithFields(logrus.Fields{
-			"error":  fmt.Sprintf("%+v\n", err),
-			"status": res.StatusCode,
-			"dump":   res.Dump(),
-		}).Error("resizeFromLocalhost response error", err)
-		return errors.New(res.String())
+			"error":       fmt.Sprintf("%+v\n", err),
+			"status":      res.StatusCode,
+			"dump":        res.Dump(),
+			"source_path": sourcePath,
+			"dest_path":   destPath,
+		}).Error("ResizeFromLocalhost response error", err)
+		return fmt.Errorf(res.String())
 	}
 
 	return nil
@@ -143,17 +154,18 @@ func (c *Client) DownloadFile(fileURL, donwloadedFilePath, fileName string) erro
 
 	// execution error
 	if err != nil {
-		return errors.Wrap(err, "resizeFromLocalhost error on download original image")
+		return fmt.Errorf("resizeFromLocalhost error on download original image: %w", err)
 	}
 	// http error
-	if res.IsError() {
+	if res.IsErrorState() {
 		logrus.WithFields(logrus.Fields{
-			"error":  fmt.Sprintf("%+v\n", err),
-			"status": res.StatusCode,
-			"body":   res.String(),
+			"error":    fmt.Sprintf("%+v\n", err),
+			"status":   res.StatusCode,
+			"body":     res.String(),
+			"file_url": fileURL,
 		}).Error("resizeFromLocalhost Response error", err)
 
-		return errors.New(res.String())
+		return fmt.Errorf(res.String())
 	}
 
 	return nil
